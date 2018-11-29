@@ -18,7 +18,7 @@ class DataGenerator(ImageDataGenerator):
     def flow(self, x, *args, **kwargs):
         while True:
 
-            # Get augmentend image samples
+            # Get augmented image samples
             ori = next(super().flow(x, *args, **kwargs))
 
             # Get masks for each image sample
@@ -31,7 +31,7 @@ class DataGenerator(ImageDataGenerator):
             masked = deepcopy(ori)
             masked[mask == 0] = 1
 
-            # Yield ([ori, masl],  ori) training batches
+            # Yield ([ori, mask],  ori) training batches
             # print(masked.shape, ori.shape)
             gc.collect()
             yield [masked, mask], ori
@@ -99,4 +99,4 @@ if __name__ == "__main__":
             plt.show()
 
     model = PConvUnet()
-    model.fit(generator, steps_per_epoch=100, epochs=5, plot_callback=plot_callback)
+    model.fit(generator, steps_per_epoch=200, epochs=5, plot_callback=plot_callback)
