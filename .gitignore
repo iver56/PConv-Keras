@@ -110,3 +110,8 @@ pexels_royalty_free_photos*
 
 # Jetbrains IDE
 .idea
+
+# Generated data
+data/test/**/*.png
+data/training/**/*.png
+data/validation/**/*.png
