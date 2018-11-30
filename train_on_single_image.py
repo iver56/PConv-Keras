@@ -19,22 +19,25 @@ class DataGenerator(ImageDataGenerator):
         while True:
 
             # Get augmented image samples
-            ori = next(super().flow(x, *args, **kwargs))
+            original_image = next(super().flow(x, *args, **kwargs))
 
             # Get masks for each image sample
             mask = np.stack(
-                [random_mask(ori.shape[1], ori.shape[2]) for _ in range(ori.shape[0])],
+                [
+                    random_mask(original_image.shape[1], original_image.shape[2])
+                    for _ in range(original_image.shape[0])
+                ],
                 axis=0,
             )
 
             # Apply masks to all image sample
-            masked = deepcopy(ori)
+            masked = deepcopy(original_image)
             masked[mask == 0] = 1
 
-            # Yield ([ori, mask],  ori) training batches
-            # print(masked.shape, ori.shape)
+            # Yield ([original_image, mask],  original_image) training batches
+            # print(masked.shape, original_image.shape)
             gc.collect()
-            yield [masked, mask], ori
+            yield [masked, mask], original_image
 
 
 if __name__ == "__main__":
@@ -72,13 +75,13 @@ if __name__ == "__main__":
     generator = datagen.flow(x=batch, batch_size=BATCH_SIZE)
 
     # Get samples & Display them
-    (masked, mask), ori = next(generator)
+    (masked, mask), original_image = next(generator)
 
     # Show side by side
     _, axes = plt.subplots(1, 3, figsize=(20, 5))
     axes[0].imshow(masked[0, :, :, :])
     axes[1].imshow(mask[0, :, :, :] * 255)
-    axes[2].imshow(ori[0, :, :, :])
+    axes[2].imshow(original_image[0, :, :, :])
 
     def plot_callback(model):
         """Called at the end of each epoch, displaying our previous test images,
@@ -88,11 +91,11 @@ if __name__ == "__main__":
         pred_img = model.predict([masked, mask])
 
         # Clear current output and display test images
-        for i in range(len(ori)):
+        for i in range(len(original_image)):
             _, axes = plt.subplots(1, 3, figsize=(20, 5))
             axes[0].imshow(masked[i, :, :, :])
             axes[1].imshow(pred_img[i, :, :, :] * 1.0)
-            axes[2].imshow(ori[i, :, :, :])
+            axes[2].imshow(original_image[i, :, :, :])
             axes[0].set_title("Masked Image")
             axes[1].set_title("Predicted Image")
             axes[2].set_title("Original Image")
