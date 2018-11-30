@@ -19,9 +19,11 @@ def get_font(font_size):
 if __name__ == "__main__":
     random.seed(2345)
 
-    os.makedirs(os.path.join("data", "training"))
-    os.makedirs(os.path.join("data", "validation"))
-    os.makedirs(os.path.join("data", "test"))
+    class_name = "numbers"
+
+    os.makedirs(os.path.join("data", "training", class_name), exist_ok=True)
+    os.makedirs(os.path.join("data", "validation", class_name), exist_ok=True)
+    os.makedirs(os.path.join("data", "test", class_name), exist_ok=True)
 
     # Generate and store images
     for i in tqdm(range(1000)):
@@ -41,11 +43,13 @@ if __name__ == "__main__":
             fill=(20, 20, 20, 20),
         )
 
-        folder = "training"
+        dataset_name = "training"
         r = random.random()
         if r < 0.1:
-            folder = "validation"
+            dataset_name = "validation"
         elif r < 0.2:
-            folder = "test"
+            dataset_name = "test"
 
-        image.save(os.path.join("data", folder, "{0:04d}.png".format(i)))
+        image.save(
+            os.path.join("data", dataset_name, class_name, "{0:04d}.png".format(i))
+        )
