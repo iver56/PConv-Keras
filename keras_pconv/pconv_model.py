@@ -16,7 +16,7 @@ from keras.layers.merge import Concatenate
 from keras.models import Model
 from keras.optimizers import Adam
 
-from libs.pconv_layer import PConv2D
+from keras_pconv.pconv_layer import PConv2D
 
 
 class PConvUnet(object):

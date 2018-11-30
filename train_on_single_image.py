@@ -6,8 +6,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from keras.preprocessing.image import ImageDataGenerator
 
-from libs.pconv_model import PConvUnet
-from libs.util import random_mask
+from keras_pconv.pconv_model import PConvUnet
+from keras_pconv.util import random_mask
 
 # Settings
 MAX_BATCH_SIZE = 128

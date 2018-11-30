@@ -10,8 +10,8 @@ from keras.preprocessing.image import ImageDataGenerator
 from matplotlib.ticker import NullFormatter
 from tqdm import tqdm
 
-from libs.pconv_model import PConvUnet
-from libs.util import random_mask
+from keras_pconv.pconv_model import PConvUnet
+from keras_pconv.util import random_mask
 
 # SETTINGS
 TRAIN_DIR = os.path.join("data", "training")
