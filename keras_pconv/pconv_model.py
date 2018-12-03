@@ -27,6 +27,7 @@ class PConvUnet(object):
         img_cols=512,
         vgg_weights="imagenet",
         inference_only=False,
+        optimizer_class=Adam,
     ):
         """Create the PConvUnet. If variable image size, set img_rows and img_cols to None"""
 
@@ -37,6 +38,7 @@ class PConvUnet(object):
         self.img_cols = img_cols
         self.img_overlap = 30
         self.inference_only = inference_only
+        self.optimizer_class = optimizer_class
 
         # Assertions
         assert self.img_rows >= 256, "Height must be >256 pixels"
@@ -70,7 +72,7 @@ class PConvUnet(object):
                 inputs=img, outputs=[img for _ in range(len(self.vgg_layers))]
             )
             model.trainable = False
-            model.compile(loss="mse", optimizer="adam")
+            model.compile(loss="mse", optimizer=self.optimizer_class())
             return model
 
         # Get the vgg network from Keras applications
@@ -86,7 +88,7 @@ class PConvUnet(object):
         # Create model and compile
         model = Model(inputs=img, outputs=vgg(img))
         model.trainable = False
-        model.compile(loss="mse", optimizer="adam")
+        model.compile(loss="mse", optimizer=self.optimizer_class())
 
         return model
 
@@ -152,7 +154,9 @@ class PConvUnet(object):
         model = Model(inputs=[inputs_img, inputs_mask], outputs=outputs)
 
         # Compile the model
-        model.compile(optimizer=Adam(lr=lr), loss=self.loss_total(inputs_mask))
+        model.compile(
+            optimizer=self.optimizer_class(lr=lr), loss=self.loss_total(inputs_mask)
+        )
 
         return model
 
