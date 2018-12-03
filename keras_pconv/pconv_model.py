@@ -28,6 +28,7 @@ class PConvUnet(object):
         vgg_weights="imagenet",
         inference_only=False,
         optimizer_class=Adam,
+        optimizer_kwargs=None,
     ):
         """Create the PConvUnet. If variable image size, set img_rows and img_cols to None"""
 
@@ -39,6 +40,10 @@ class PConvUnet(object):
         self.img_overlap = 30
         self.inference_only = inference_only
         self.optimizer_class = optimizer_class
+        if optimizer_kwargs is None:
+            self.optimizer_kwargs = {"lr": 0.0002}
+        else:
+            self.optimizer_kwargs = optimizer_kwargs
 
         # Assertions
         assert self.img_rows >= 256, "Height must be >256 pixels"
@@ -92,7 +97,7 @@ class PConvUnet(object):
 
         return model
 
-    def build_pconv_unet(self, train_bn=True, lr=0.0002):
+    def build_pconv_unet(self, train_bn=True):
 
         # INPUTS
         inputs_img = Input((self.img_rows, self.img_cols, 3), name="inputs_img")
@@ -155,7 +160,8 @@ class PConvUnet(object):
 
         # Compile the model
         model.compile(
-            optimizer=self.optimizer_class(lr=lr), loss=self.loss_total(inputs_mask)
+            optimizer=self.optimizer_class(**self.optimizer_kwargs),
+            loss=self.loss_total(inputs_mask),
         )
 
         return model
@@ -267,10 +273,10 @@ class PConvUnet(object):
     def save(self):
         self.model.save_weights(self.get_current_weight_file_path())
 
-    def load(self, filepath, train_bn=True, lr=0.0002):
+    def load(self, filepath, train_bn=True):
 
         # Create UNet-like model
-        self.model = self.build_pconv_unet(train_bn, lr)
+        self.model = self.build_pconv_unet(train_bn)
 
         # Load weights into model
         epoch = int(os.path.basename(filepath).split("_")[0])

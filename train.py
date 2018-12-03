@@ -6,6 +6,7 @@ from copy import deepcopy
 import matplotlib.pyplot as plt
 import numpy as np
 from keras.callbacks import TensorBoard
+from keras.optimizers import SGD, Adam
 from keras.preprocessing.image import ImageDataGenerator
 from matplotlib.ticker import NullFormatter
 from tqdm import tqdm
@@ -113,7 +114,11 @@ def plot_callback(model):
 
 
 # Instantiate the model
-model = PConvUnet(weight_file_path=os.path.join("data", "logs"))
+model = PConvUnet(
+    weight_file_path=os.path.join("data", "logs"),
+    optimizer_class=Adam,
+    optimizer_kwargs=dict(lr=0.0002),
+)
 
 # Run training for certain amount of epochs
 model.fit(
