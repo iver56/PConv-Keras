@@ -22,16 +22,17 @@ from keras_pconv.pconv_layer import PConv2D
 class PConvUnet(object):
     def __init__(
         self,
+        weight_file_path,
         img_rows=512,
         img_cols=512,
-        weight_filepath=None,
         vgg_weights="imagenet",
         inference_only=False,
     ):
         """Create the PConvUnet. If variable image size, set img_rows and img_cols to None"""
 
         # Settings
-        self.weight_filepath = weight_filepath
+        assert weight_file_path is not None, "Must specify location of logs"
+        self.weight_file_path = weight_file_path
         self.img_rows = img_rows
         self.img_cols = img_cols
         self.img_overlap = 30
@@ -252,7 +253,7 @@ class PConvUnet(object):
                 plot_callback(self.model)
 
             # Save logfile
-            if self.weight_filepath:
+            if self.weight_file_path:
                 self.save()
 
     def summary(self):
@@ -260,7 +261,7 @@ class PConvUnet(object):
         print(self.model.summary())
 
     def save(self):
-        self.model.save_weights(self.current_weightfile())
+        self.model.save_weights(self.get_current_weight_file_path())
 
     def load(self, filepath, train_bn=True, lr=0.0002):
 
@@ -275,10 +276,10 @@ class PConvUnet(object):
         self.current_epoch = epoch
         self.model.load_weights(filepath)
 
-    def current_weightfile(self):
-        assert self.weight_filepath != None, "Must specify location of logs"
-        return self.weight_filepath + "{}_weights_{}.h5".format(
-            self.current_epoch, self.current_timestamp()
+    def get_current_weight_file_path(self):
+        return os.path.join(
+            self.weight_file_path,
+            "{}_weights_{}.h5".format(self.current_epoch, self.current_timestamp()),
         )
 
     @staticmethod

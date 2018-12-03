@@ -113,7 +113,7 @@ def plot_callback(model):
 
 
 # Instantiate the model
-model = PConvUnet(weight_filepath=os.path.join("data", "logs"))
+model = PConvUnet(weight_file_path=os.path.join("data", "logs"))
 
 # Run training for certain amount of epochs
 model.fit(
