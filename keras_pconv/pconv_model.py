@@ -299,7 +299,7 @@ class PConvUnet(object):
             )
 
     @staticmethod
-    def gram_matrix(x, norm_by_channels=False):
+    def gram_matrix(x):
         """Calculate gram matrix used in style loss"""
 
         # Assertions on input
