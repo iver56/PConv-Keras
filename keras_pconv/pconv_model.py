@@ -22,7 +22,6 @@ from keras_pconv.pconv_layer import PConv2D
 class PConvUnet(object):
     def __init__(
         self,
-        weight_file_path,
         img_rows=512,
         img_cols=512,
         vgg_weights="imagenet",
@@ -33,8 +32,6 @@ class PConvUnet(object):
         """Create the PConvUnet. If variable image size, set img_rows and img_cols to None"""
 
         # Settings
-        assert weight_file_path is not None, "Must specify location of logs"
-        self.weight_file_path = weight_file_path
         self.img_rows = img_rows
         self.img_cols = img_cols
         self.img_overlap = 30
@@ -235,12 +232,12 @@ class PConvUnet(object):
         b = self.l1(P[:, :, 1:, :], P[:, :, :-1, :])
         return a + b
 
-    def fit(self, generator, epochs=10, plot_callback=None, *args, **kwargs):
+    def fit(self, generator, epochs=10, callback=None, *args, **kwargs):
         """Fit the U-Net to a (images, targets) generator
         
         param generator: training generator yielding (maskes_image, original_image) tuples
         param epochs: number of epochs to train for
-        param plot_callback: callback function taking Unet model as parameter
+        param callback: callback function taking Unet model as parameter
         """
 
         # Loop over epochs
@@ -259,38 +256,27 @@ class PConvUnet(object):
             self.current_epoch += 1
 
             # After each epoch predict on test images & show them
-            if plot_callback:
-                plot_callback(self.model)
-
-            # Save logfile
-            if self.weight_file_path:
-                self.save()
+            if callback:
+                callback(self.model)
 
     def summary(self):
         """Get summary of the UNet model"""
         print(self.model.summary())
 
-    def save(self):
-        self.model.save_weights(self.get_current_weight_file_path())
+    def save(self, file_path):
+        self.model.save_weights(file_path)
 
     def load(self, filepath, train_bn=True):
-
         # Create UNet-like model
         self.model = self.build_pconv_unet(train_bn)
 
-        # Load weights into model
-        epoch = int(os.path.basename(filepath).split("_")[0])
-        assert (
-            epoch > 0
-        ), "Could not parse weight file. Should start with 'X_', with X being the epoch"
-        self.current_epoch = epoch
-        self.model.load_weights(filepath)
+        try:
+            self.current_epoch = int(os.path.basename(filepath).split("_")[0])
+        except ValueError:
+            self.current_epoch = 1
 
-    def get_current_weight_file_path(self):
-        return os.path.join(
-            self.weight_file_path,
-            "{}_weights_{}.h5".format(self.current_epoch, self.current_timestamp()),
-        )
+        # Load weights into model
+        self.model.load_weights(filepath)
 
     @staticmethod
     def current_timestamp():

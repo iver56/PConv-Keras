@@ -102,4 +102,4 @@ if __name__ == "__main__":
             plt.show()
 
     model = PConvUnet()
-    model.fit(generator, steps_per_epoch=200, epochs=5, plot_callback=plot_callback)
+    model.fit(generator, steps_per_epoch=200, epochs=5, callback=plot_callback)

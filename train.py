@@ -115,7 +115,6 @@ def plot_callback(model):
 
 # Instantiate the model
 model = PConvUnet(
-    weight_file_path=os.path.join("data", "logs"),
     optimizer_class=Adam,
     optimizer_kwargs=dict(lr=0.0002),
 )
@@ -127,7 +126,7 @@ model.fit(
     validation_data=val_generator,
     validation_steps=100,
     epochs=10,
-    plot_callback=plot_callback,
+    callback=plot_callback,
     callbacks=[
         TensorBoard(
             log_dir=os.path.join("data", "logs", "initial_training"), write_graph=False
